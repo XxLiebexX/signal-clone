@@ -12,7 +12,7 @@ export const AuthModal: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
-  const [useFirebase, setUseFirebase] = useState(true);
+  const [useFirebase, setUseFirebase] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -74,19 +74,7 @@ export const AuthModal: React.FC = () => {
     try {
       if (useFirebase && confirmationResult) {
         const { idToken } = await verifyFirebaseOtp(confirmationResult, code);
-        // Authenticate with FastAPI backend
-        const res = await fetch('http://127.0.0.1:8000/api/auth/firebase-login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            phone: phone.trim(),
-            firebase_id_token: idToken,
-          }),
-        });
-
-        if (!res.ok) throw new Error('Backend session creation failed');
-        const data = await res.json();
-
+        const data = await api.firebaseLogin(phone.trim(), idToken);
         localStorage.setItem('signal_token', data.access_token);
         window.location.reload();
       } else {

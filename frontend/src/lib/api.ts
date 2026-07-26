@@ -53,6 +53,16 @@ export const api = {
     return res.json();
   },
 
+  firebaseLogin: async (phone: string, idToken: string) => {
+    const res = await fetch(`${API_BASE}/auth/firebase-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, firebase_id_token: idToken }),
+    });
+    if (!res.ok) throw new Error('Backend session creation failed');
+    return res.json();
+  },
+
   register: async (data: { phone: string; username: string; display_name: string; avatar_url?: string; about?: string }) => {
     const res = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
