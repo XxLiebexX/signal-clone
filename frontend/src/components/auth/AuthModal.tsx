@@ -5,20 +5,41 @@ import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 import { setupRecaptcha, sendFirebaseOtp, verifyFirebaseOtp, isFirebaseConfigured } from '@/lib/firebase';
 import { ConfirmationResult } from 'firebase/auth';
-import { Shield, Smartphone, ArrowRight, UserCheck, Key, Sparkles, Flame, CheckCircle2 } from 'lucide-react';
+import { Shield, Smartphone, ArrowRight, UserCheck, Key, Sparkles, Flame, CheckCircle2, User } from 'lucide-react';
+
+const HARDCODED_DEMO_ACCOUNTS = [
+  {
+    display_name: 'Yuvraj',
+    phone: '+919876543210',
+    avatar_url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200',
+    about: 'Privacy Enthusiast & Tech Lead 🛡️',
+  },
+  {
+    display_name: 'Angel',
+    phone: '+919876543211',
+    avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200',
+    about: 'Building modern fullstack applications 🚀',
+  },
+  {
+    display_name: 'Rio',
+    phone: '+919876543212',
+    avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200',
+    about: 'Signal UI & Encrypted Chat Advocate ✨',
+  },
+];
 
 export const AuthModal: React.FC = () => {
-  const { loginWithPhone, switchUser, allDemoUsers, loading } = useAuth();
+  const { loginWithPhone, loading } = useAuth();
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
+  const [useCustomPhone, setUseCustomPhone] = useState(false);
   const [useFirebase, setUseFirebase] = useState(false);
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    // Clean up recaptcha container
     return () => {
       if (typeof window !== 'undefined' && (window as any).recaptchaVerifier) {
         try {
@@ -28,10 +49,22 @@ export const AuthModal: React.FC = () => {
     };
   }, []);
 
+  const handleDirectDemoLogin = async (phoneNum: string) => {
+    setError(null);
+    setSubmitting(true);
+    try {
+      await loginWithPhone(phoneNum, '123456');
+    } catch (err: any) {
+      setError(err.message || 'Login failed. Please check connection.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone.trim()) {
-      setError('Please enter a phone number in E.164 format (e.g. +15550192834)');
+      setError('Please enter a phone number (e.g. +919876543210)');
       return;
     }
     setError(null);
@@ -100,63 +133,8 @@ export const AuthModal: React.FC = () => {
             <Shield className="w-9 h-9 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-white tracking-tight">Signal Messenger</h2>
-          <p className="text-xs text-[#8E8E93] mt-1">Real-time Encrypted Messaging with Firebase Auth</p>
+          <p className="text-xs text-[#8E8E93] mt-1">Select an account below for instant 1-Click Login</p>
         </div>
-
-        {/* Auth Mode Selector */}
-        <div className="flex items-center justify-center gap-2 mb-6 bg-[#1C1C1E] p-1 rounded-xl border border-[#2C2C2E]">
-          <button
-            type="button"
-            onClick={() => setUseFirebase(true)}
-            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
-              useFirebase ? 'bg-[#2C6BED] text-white shadow-md' : 'text-[#8E8E93] hover:text-white'
-            }`}
-          >
-            <Flame className="w-3.5 h-3.5" /> Firebase SMS OTP
-          </button>
-          <button
-            type="button"
-            onClick={() => setUseFirebase(false)}
-            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
-              !useFirebase ? 'bg-[#2C6BED] text-white shadow-md' : 'text-[#8E8E93] hover:text-white'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5" /> Quick Demo Login
-          </button>
-        </div>
-
-        {/* Quick User Switcher Section */}
-        {allDemoUsers && allDemoUsers.length > 0 && (
-          <div className="mb-6 p-3 bg-[#242426] border border-[#2C2C2E] rounded-2xl">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-semibold text-[#2C6BED] flex items-center gap-1">
-                <Sparkles className="w-3 h-3" /> Quick Demo Accounts (1-Click)
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-1.5">
-              {allDemoUsers.map((u) => (
-                <button
-                  key={u.id}
-                  type="button"
-                  onClick={() => switchUser(u)}
-                  disabled={loading || submitting}
-                  className="flex items-center gap-2 p-1.5 rounded-lg bg-[#1C1C1E] hover:bg-[#2C6BED]/20 border border-[#2C2C2E] hover:border-[#2C6BED] transition text-left group"
-                >
-                  <img
-                    src={u.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'}
-                    alt={u.display_name}
-                    className="w-6 h-6 rounded-full object-cover"
-                  />
-                  <div className="overflow-hidden">
-                    <div className="text-[11px] font-medium text-white truncate group-hover:text-[#2C6BED]">
-                      {u.display_name}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {error && (
           <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-xs text-red-400 text-center leading-relaxed">
@@ -164,68 +142,105 @@ export const AuthModal: React.FC = () => {
           </div>
         )}
 
-        {step === 'phone' ? (
-          <form onSubmit={handlePhoneSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-[#8E8E93] mb-1">
-                Mobile Phone Number ({useFirebase ? 'Sends Real SMS OTP via Firebase' : 'Mock Code 123456'})
-              </label>
-              <div className="relative">
-                <Smartphone className="absolute left-3.5 top-3 w-4 h-4 text-[#8E8E93]" />
-                <input
-                  type="tel"
-                  placeholder="+1 555 019 2834"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-[#1C1C1E] border border-[#2C2C2E] focus:border-[#2C6BED] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-[#8E8E93] focus:outline-none transition"
-                />
-              </div>
-            </div>
+        {/* PROMINENT 1-CLICK DIRECT LOGIN BUTTONS */}
+        <div className="mb-6 space-y-2">
+          <div className="text-[11px] font-bold text-[#2C6BED] uppercase tracking-wider text-center mb-2 flex items-center justify-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5" /> Direct 1-Click Account Login
+          </div>
+
+          {HARDCODED_DEMO_ACCOUNTS.map((acc) => (
             <button
-              type="submit"
-              disabled={submitting}
-              className="w-full bg-[#2C6BED] hover:bg-[#3B75EE] disabled:opacity-50 text-white font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-[#2C6BED]/20 text-xs"
+              key={acc.phone}
+              type="button"
+              onClick={() => handleDirectDemoLogin(acc.phone)}
+              disabled={loading || submitting}
+              className="w-full flex items-center justify-between p-3 rounded-2xl bg-[#242426] hover:bg-[#2C6BED] border border-[#2C2C2E] hover:border-[#2C6BED] transition-all duration-200 group shadow-md"
             >
-              <span>{submitting ? 'Sending SMS OTP...' : 'Send Verification OTP'}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleOtpSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-[#8E8E93] mb-1">
-                Enter 6-Digit SMS Verification Code
-              </label>
-              <div className="relative">
-                <Key className="absolute left-3.5 top-3 w-4 h-4 text-[#8E8E93]" />
-                <input
-                  type="text"
-                  placeholder="123456"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  className="w-full bg-[#1C1C1E] border border-[#2C2C2E] focus:border-[#2C6BED] rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-[#8E8E93] focus:outline-none transition tracking-widest text-center font-mono"
+              <div className="flex items-center gap-3">
+                <img
+                  src={acc.avatar_url}
+                  alt={acc.display_name}
+                  className="w-10 h-10 rounded-full object-cover border border-[#2C2C2E] group-hover:border-white/40 transition"
                 />
+                <div className="text-left">
+                  <div className="text-sm font-bold text-white group-hover:text-white transition">
+                    Login as {acc.display_name}
+                  </div>
+                  <div className="text-[11px] text-[#8E8E93] group-hover:text-white/80 transition">
+                    {acc.about}
+                  </div>
+                </div>
               </div>
+              <ArrowRight className="w-5 h-5 text-[#2C6BED] group-hover:text-white group-hover:translate-x-1 transition-all" />
+            </button>
+          ))}
+        </div>
+
+        {/* CUSTOM PHONE NUMBER ACCORDION TOGGLE */}
+        <div className="pt-2 border-t border-[#2C2C2E]/60 text-center">
+          <button
+            type="button"
+            onClick={() => setUseCustomPhone(!useCustomPhone)}
+            className="text-xs text-[#8E8E93] hover:text-[#2C6BED] font-medium transition"
+          >
+            {useCustomPhone ? '▲ Hide Custom Phone Input' : '▼ Or enter a custom phone number / SMS OTP'}
+          </button>
+
+          {useCustomPhone && (
+            <div className="mt-4 transition-all">
+              {step === 'phone' ? (
+                <form onSubmit={handlePhoneSubmit} className="space-y-3">
+                  <div>
+                    <input
+                      type="tel"
+                      placeholder="e.g. +919876543210"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full bg-[#1C1C1E] border border-[#2C2C2E] focus:border-[#2C6BED] rounded-xl px-4 py-2.5 text-xs text-white placeholder-[#8E8E93] focus:outline-none transition"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-full bg-[#2C6BED] hover:bg-[#3B75EE] disabled:opacity-50 text-white font-semibold py-2 rounded-xl transition text-xs flex items-center justify-center gap-2 shadow"
+                  >
+                    <span>{submitting ? 'Connecting...' : 'Proceed with OTP 123456'}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleOtpSubmit} className="space-y-3">
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="123456"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      className="w-full bg-[#1C1C1E] border border-[#2C2C2E] focus:border-[#2C6BED] rounded-xl px-4 py-2.5 text-xs text-white placeholder-[#8E8E93] focus:outline-none transition text-center font-mono"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setStep('phone')}
+                      className="w-1/3 bg-[#242426] hover:bg-[#2C2C2E] text-[#8E8E93] font-semibold py-2 rounded-xl transition text-xs"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="w-2/3 bg-[#2C6BED] hover:bg-[#3B75EE] disabled:opacity-50 text-white font-semibold py-2 rounded-xl transition flex items-center justify-center gap-2 text-xs"
+                    >
+                      <UserCheck className="w-3.5 h-3.5" />
+                      <span>Confirm & Login</span>
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setStep('phone')}
-                className="w-1/3 bg-[#242426] hover:bg-[#2C2C2E] text-[#8E8E93] font-semibold py-2.5 rounded-xl transition text-xs"
-              >
-                Back
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-2/3 bg-[#2C6BED] hover:bg-[#3B75EE] disabled:opacity-50 text-white font-semibold py-2.5 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-[#2C6BED]/20 text-xs"
-              >
-                <UserCheck className="w-4 h-4" />
-                <span>{submitting ? 'Verifying OTP...' : 'Confirm & Login'}</span>
-              </button>
-            </div>
-          </form>
-        )}
+          )}
+        </div>
 
       </div>
     </div>
