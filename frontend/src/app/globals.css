@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-primary: #121212;
+    --bg-sidebar: #1E1E1E;
+    --bg-card: #242426;
+    --bg-hover: #2C2C2E;
+    --bg-input: #1C1C1E;
+    --color-signal-blue: #2C6BED;
+    --color-signal-blue-hover: #3B75EE;
+    --bubble-incoming: #262628;
+    --bubble-outgoing: #2C6BED;
+    --text-primary: #F5F5F5;
+    --text-secondary: #8E8E93;
+    --border-color: #2C2C2E;
+  }
+
+  .light {
+    --bg-primary: #F2F2F7;
+    --bg-sidebar: #FFFFFF;
+    --bg-card: #F9F9FB;
+    --bg-hover: #E5E5EA;
+    --bg-input: #EFEFF4;
+    --color-signal-blue: #2C6BED;
+    --color-signal-blue-hover: #1A54D4;
+    --bubble-incoming: #E9E9EB;
+    --bubble-outgoing: #2C6BED;
+    --text-primary: #000000;
+    --text-secondary: #6C6C70;
+    --border-color: #E5E5EA;
+  }
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* Custom Signal Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(140, 140, 145, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(140, 140, 145, 0.6);
+}
+
+/* Audio Visualizer Waves Keyframes */
+@keyframes audioWave {
+  0%, 100% { height: 6px; }
+  50% { height: 28px; }
+}
+
+.animate-wave-1 { animation: audioWave 1.2s ease-in-out infinite 0.1s; }
+.animate-wave-2 { animation: audioWave 1.2s ease-in-out infinite 0.3s; }
+.animate-wave-3 { animation: audioWave 1.2s ease-in-out infinite 0.2s; }
+.animate-wave-4 { animation: audioWave 1.2s ease-in-out infinite 0.4s; }
+
+/* Pulse animation for call button indicator */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s infinite ease-in-out;
+}
