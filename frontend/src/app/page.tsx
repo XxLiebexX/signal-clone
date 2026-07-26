@@ -341,10 +341,9 @@ export default function Home() {
     );
   }
 
-  // TEMPORARILY COMMENTED OUT AUTH MODAL FOR DIRECT CHAT TESTING AS REQUESTED BY USER
-  // if (!user || !token) {
-  //   return <AuthModal />;
-  // }
+  if (!user || !token) {
+    return <AuthModal />;
+  }
 
   return (
     <main className="flex h-screen w-screen overflow-hidden bg-[#121212]">
