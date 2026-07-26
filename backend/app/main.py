@@ -103,6 +103,19 @@ def seed_demo_accounts():
                     cm2 = ConversationMember(conversation_id=conv.id, user_id=u2.id, role="member")
                     db.add_all([cm1, cm2])
                     db.commit()
+
+                    # Add initial welcome message
+                    init_msg = Message(
+                        conversation_id=conv.id,
+                        sender_id=u2.id,
+                        content=f"Hey {u1.display_name}! Welcome to Signal Messenger 🚀",
+                        status="delivered"
+                    )
+                    db.add(init_msg)
+                    db.commit()
+                    conv.last_message_id = init_msg.id
+                    conv.updated_at = datetime.utcnow()
+                    db.commit()
     except Exception as e:
         logger.error(f"Seeding error: {e}")
     finally:
