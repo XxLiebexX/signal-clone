@@ -16,9 +16,23 @@ interface Props {
 const QUICK_EMOJI_LIST = ['❤️', '👍', '👎', '😂', '😮', '🔥', '💩'];
 const FULL_EMOJI_CATALOG = [
   '❤️', '👍', '👎', '😂', '😮', '🔥', '💩', '🎉', '🔒', '🛡️', '🚀', '✨',
-  '🙌', '💯', '😍', '👏', '🙏', '🥳', '😎', '💡', '💬', '👀', '🤯', '🤝',
   '⭐', '💥', '🎯', '⚡', '🏆', '🍕', '☕', '❤️‍🔥', '✅', '❌'
 ];
+
+const formatMessageTime = (dateStr: string) => {
+  try {
+    if (!dateStr) return format(new Date(), 'h:mm a');
+    let dStr = dateStr.trim();
+    if (!dStr.endsWith('Z') && !dStr.includes('+')) {
+      dStr = dStr.replace(' ', 'T') + 'Z';
+    }
+    const date = new Date(dStr);
+    if (isNaN(date.getTime())) return format(new Date(), 'h:mm a');
+    return format(date, 'h:mm a');
+  } catch (e) {
+    return format(new Date(), 'h:mm a');
+  }
+};
 
 export const MessageBubble: React.FC<Props> = ({ message, isGroup, onReply, onAddReaction }) => {
   const { user } = useAuth();
@@ -233,7 +247,7 @@ export const MessageBubble: React.FC<Props> = ({ message, isGroup, onReply, onAd
               {timeLeft}s
             </span>
           )}
-          <span>{format(new Date(message.created_at), 'h:mm a')}</span>
+          <span>{formatMessageTime(message.created_at)}</span>
 
           {isMine && (
             <span className="ml-0.5">
