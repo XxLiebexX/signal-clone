@@ -1,8 +1,8 @@
 import { User, Contact, Conversation, Message, Reaction } from '@/types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL
-  ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api`
-  : 'http://127.0.0.1:8000/api';
+const rawBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000';
+const cleanBase = rawBase.replace(/\/+$/, '');
+const API_BASE = cleanBase.endsWith('/api') ? cleanBase : `${cleanBase}/api`;
 
 async function fetchWithAuth(url: string, options: RequestInit = {}, token?: string) {
   const authToken = token || (typeof window !== 'undefined' ? localStorage.getItem('signal_token') : null);

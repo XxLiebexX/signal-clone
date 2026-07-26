@@ -20,7 +20,10 @@ class SignalWebSocket {
       this.ws.close();
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_WS_BASE_URL || 'ws://127.0.0.1:8000';
+    let baseUrl = process.env.NEXT_PUBLIC_WS_BASE_URL || 'ws://127.0.0.1:8000';
+    baseUrl = baseUrl.replace(/\/+$/, '');
+    if (baseUrl.startsWith('http://')) baseUrl = baseUrl.replace('http://', 'ws://');
+    if (baseUrl.startsWith('https://')) baseUrl = baseUrl.replace('https://', 'wss://');
     const wsUrl = `${baseUrl}/ws?token=${token}`;
     this.ws = new WebSocket(wsUrl);
 
