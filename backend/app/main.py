@@ -108,13 +108,18 @@ def seed_demo_accounts():
     finally:
         db.close()
 
-seed_demo_accounts()
-
 app = FastAPI(
     title="Signal Messenger Clone API",
     description="Backend API for Signal Clone featuring WebSockets, SQLite, and Auth",
     version="1.0.0"
 )
+
+@app.on_event("startup")
+def on_startup():
+    try:
+        seed_demo_accounts()
+    except Exception as e:
+        logger.error(f"Startup seeding error: {e}")
 
 # Enable CORS for Next.js frontend
 app.add_middleware(
