@@ -57,11 +57,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginWithPhone = async (phone: string, code: string = '123456') => {
     setLoading(true);
     try {
+      localStorage.removeItem('signal_token');
       const res = await api.phoneLogin(phone, code);
+      if (!res || !res.access_token || !res.user) {
+        throw new Error('Invalid response from authentication server');
+      }
       localStorage.setItem('signal_token', res.access_token);
       setToken(res.access_token);
       setUser(res.user);
       wsClient.connect(res.access_token);
+    } catch (err) {
+      localStorage.removeItem('signal_token');
+      setToken(null);
+      setUser(null);
+      throw err;
     } finally {
       setLoading(false);
     }

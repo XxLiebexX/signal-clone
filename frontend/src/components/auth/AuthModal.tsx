@@ -153,7 +153,7 @@ export const AuthModal: React.FC = () => {
               key={acc.phone}
               type="button"
               onClick={() => handleDirectDemoLogin(acc.phone)}
-              disabled={loading || submitting}
+              disabled={submitting}
               className="w-full flex items-center justify-between p-3 rounded-2xl bg-[#242426] hover:bg-[#2C6BED] border border-[#2C2C2E] hover:border-[#2C6BED] transition-all duration-200 group shadow-md"
             >
               <div className="flex items-center gap-3">
