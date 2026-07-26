@@ -1,10 +1,9 @@
 import { User, Contact, Conversation, Message, Reaction } from '@/types';
 
-const rawBase = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-const cleanBase = rawBase ? rawBase.replace(/\/+$/, '') : '';
-const API_BASE = cleanBase
-  ? (cleanBase.endsWith('/api') ? cleanBase : `${cleanBase}/api`)
-  : '/api';
+const DEFAULT_RENDER_URL = 'https://signal-clone-ryey.onrender.com';
+const rawBase = process.env.NEXT_PUBLIC_API_BASE_URL || DEFAULT_RENDER_URL;
+const cleanBase = rawBase.replace(/\/+$/, '');
+const API_BASE = cleanBase.endsWith('/api') ? cleanBase : `${cleanBase}/api`;
 
 async function fetchWithAuth(url: string, options: RequestInit = {}, token?: string) {
   const authToken = token || (typeof window !== 'undefined' ? localStorage.getItem('signal_token') : null);
