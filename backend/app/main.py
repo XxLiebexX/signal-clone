@@ -134,6 +134,8 @@ app.add_middleware(
 os.makedirs("./static/uploads", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+from fastapi.responses import FileResponse
+
 # Include Routers
 app.include_router(auth_router.router)
 app.include_router(users_router.router)
@@ -141,14 +143,36 @@ app.include_router(conversations_router.router)
 app.include_router(messages_router.router)
 app.include_router(stories_router.router)
 
-@app.get("/")
-def root():
-    return {
-        "status": "online",
-        "app": "Signal Messenger Clone Backend API",
-        "version": "1.0.0",
-        "docs": "/docs"
-    }
+# Mount Next.js frontend static build if available
+frontend_out_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "out"))
+if os.path.exists(frontend_out_dir):
+    _next_dir = os.path.join(frontend_out_dir, "_next")
+    if os.path.exists(_next_dir):
+        app.mount("/_next", StaticFiles(directory=_next_dir), name="frontend_next")
+
+    @app.get("/{full_path:path}")
+    def serve_frontend(full_path: str = ""):
+        if full_path.startswith("api/") or full_path == "ws" or full_path.startswith("static/"):
+            raise HTTPException(status_code=404, detail="Not Found")
+        
+        target_path = os.path.join(frontend_out_dir, full_path)
+        if os.path.isfile(target_path):
+            return FileResponse(target_path)
+        
+        index_path = os.path.join(frontend_out_dir, "index.html")
+        if os.path.isfile(index_path):
+            return FileResponse(index_path)
+        
+        return {"status": "online", "app": "Signal Messenger Clone Backend API"}
+else:
+    @app.get("/")
+    def root():
+        return {
+            "status": "online",
+            "app": "Signal Messenger Clone Backend API",
+            "version": "1.0.0",
+            "docs": "/docs"
+        }
 
 # WebSocket Endpoint
 @app.websocket("/ws")
