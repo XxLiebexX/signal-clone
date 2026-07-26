@@ -27,7 +27,6 @@ async function fetchWithAuth(url: string, options: RequestInit = {}, token?: str
       if (res.status === 401) {
         if (typeof window !== 'undefined') {
           localStorage.removeItem('signal_token');
-          window.location.reload();
         }
       }
       const err = await res.json().catch(() => ({ detail: 'API Error' }));

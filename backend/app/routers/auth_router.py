@@ -15,8 +15,10 @@ def phone_login(req: PhoneLoginRequest, db: Session = Depends(get_db)):
     # Clean phone number
     phone = req.phone.strip()
     
-    # Check if user exists by phone
+    # Check if user exists by phone (exact or suffix match)
     user = db.query(User).filter(User.phone == phone).first()
+    if not user:
+        user = db.query(User).filter(User.phone.endswith(phone.replace("+", ""))).first()
     
     if not user:
         # Create a user automatically for fast onboarding demo!
