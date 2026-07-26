@@ -44,12 +44,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           wsClient.connect(savedToken);
         })
         .catch(() => {
-          localStorage.removeItem('signal_token');
-          setToken(null);
+          loginWithPhone('+919876543210', '123456').catch(() => {});
         })
         .finally(() => setLoading(false));
     } else {
-      setLoading(false);
+      loginWithPhone('+919876543210', '123456')
+        .catch(() => {})
+        .finally(() => setLoading(false));
     }
     fetchDemoUsers();
   }, []);
