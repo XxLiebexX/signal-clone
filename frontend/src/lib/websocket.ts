@@ -20,7 +20,7 @@ class SignalWebSocket {
       this.ws.close();
     }
 
-    let baseUrl = process.env.NEXT_PUBLIC_WS_BASE_URL || (typeof window !== 'undefined' ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}` : 'wss://signal-clone-ryey.onrender.com');
+    let baseUrl = process.env.NEXT_PUBLIC_WS_BASE_URL || 'ws://127.0.0.1:8000';
     baseUrl = baseUrl.replace(/\/+$/, '');
     if (baseUrl.startsWith('http://')) baseUrl = baseUrl.replace('http://', 'ws://');
     if (baseUrl.startsWith('https://')) baseUrl = baseUrl.replace('https://', 'wss://');

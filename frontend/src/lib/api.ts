@@ -1,6 +1,6 @@
 import { User, Contact, Conversation, Message, Reaction } from '@/types';
 
-const rawBase = process.env.NEXT_PUBLIC_API_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://signal-clone-ryey.onrender.com');
+const rawBase = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000';
 const cleanBase = rawBase.replace(/\/+$/, '');
 const API_BASE = cleanBase.endsWith('/api') ? cleanBase : `${cleanBase}/api`;
 
