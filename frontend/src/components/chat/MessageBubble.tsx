@@ -46,7 +46,11 @@ export const MessageBubble: React.FC<Props> = ({ message, isGroup, onReply, onAd
     if (!message.expires_at) return;
 
     const updateTimer = () => {
-      const expiry = new Date(message.expires_at!).getTime();
+      let expiryStr = String(message.expires_at).trim();
+      if (!expiryStr.endsWith('Z') && !expiryStr.includes('+')) {
+        expiryStr = expiryStr.replace(' ', 'T') + 'Z';
+      }
+      const expiry = new Date(expiryStr).getTime();
       const now = new Date().getTime();
       const diff = Math.max(0, Math.floor((expiry - now) / 1000));
       setTimeLeft(diff);

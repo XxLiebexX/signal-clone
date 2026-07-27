@@ -50,8 +50,8 @@ def build_message_out(msg: Message, db: Session) -> dict:
         "message_type": msg.message_type,
         "media_url": msg.media_url,
         "status": msg.status,
-        "expires_at": msg.expires_at,
-        "created_at": msg.created_at,
+        "expires_at": msg.expires_at.isoformat() + "Z" if isinstance(msg.expires_at, datetime) else (str(msg.expires_at) + "Z" if msg.expires_at and not str(msg.expires_at).endswith("Z") else msg.expires_at),
+        "created_at": msg.created_at.isoformat() + "Z" if isinstance(msg.created_at, datetime) else (str(msg.created_at) + "Z" if msg.created_at and not str(msg.created_at).endswith("Z") else msg.created_at),
         "reactions": reactions_out
     }
 
